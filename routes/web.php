@@ -22,6 +22,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/students', [StudentsController::class, 'students_show'])->name('students');
+
+    Route::get('/students/create', [StudentsController::class, 'student_form']);
+    Route::post('/students/create/input', [StudentsController::class, 'student_create'])->name('student.input');
+
+    Route::get('/students/class/{class_id}', [StudentsController::class, 'studentsByClass'])->name('students.byClass');
+
+
+    
+
+
+
     Route::get('/feedback', function() {
         return view('feedback');
     })->name('feedback');

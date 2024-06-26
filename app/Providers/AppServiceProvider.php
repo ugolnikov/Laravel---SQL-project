@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Rules\UniqueStudent;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Schema::defaultStringLength(191);
+        Validator::extend('unique_student', function ($attribute, $value, $parameters, $validator) {
+            $rule = new UniqueStudent();
+            return $rule->passes($attribute, $value);
+        }, 'Ученик с такими ФИО и датой рождения уже существует.');
     }
 }

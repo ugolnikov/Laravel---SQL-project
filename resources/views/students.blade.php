@@ -27,12 +27,13 @@
                         <table class="table-fixed w-full text-center text-gray-900 dark:text-gray-100">
                             <thead>
                                 <tr>
-                                    <th class="w-1/6">{{ __("Id") }}</th>
-                                    <th class="w-1/6">{{ __("Surname") }}</th>
-                                    <th class="w-1/6">{{ __("First name") }}</th>
-                                    <th class="w-1/6">{{ __("Patronymic") }}</th>
-                                    <th class="w-1/6">{{ __("Birthdate") }}</th>
-                                    <th class="w-1/6">{{ __("Class") }}</th>
+                                    <th class="w-1/7">{{ __("Id") }}</th>
+                                    <th class="w-1/7">{{ __("Surname") }}</th>
+                                    <th class="w-1/7">{{ __("First name") }}</th>
+                                    <th class="w-1/7">{{ __("Patronymic") }}</th>
+                                    <th class="w-1/7">{{ __("Birthdate") }}</th>
+                                    <th class="w-1/7">{{ __("Class") }}</th>
+                                    <th class="w-1/7">{{ __("Action") }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -44,6 +45,13 @@
                                         <td>{{ $el->patronymic }}</td>
                                         <td>{{ $el->birthdate }}</td>
                                         <td>{{ $el->class->name }}</td>
+                                        <td>
+                                            <form action="{{ route('students.destroy', $el->id) }}" method="POST" class="delete-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="delete-btn border hover:bg-red-600 ease-in-out duration-300 rounded p-1.5">{{ __("Delete") }}</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -55,12 +63,13 @@
                     <table id="studentsTableHead" style="display: none" class="table-fixed w-full text-center text-gray-900 dark:text-gray-100">
                         <thead>
                             <tr>
-                                <th class="w-1/6">{{ __("Id") }}</th>
-                                <th class="w-1/6">{{ __("Surname") }}</th>
-                                <th class="w-1/6">{{ __("First name") }}</th>
-                                <th class="w-1/6">{{ __("Patronymic") }}</th>
-                                <th class="w-1/6">{{ __("Birthdate") }}</th>
-                                <th class="w-1/6">{{ __("Class") }}</th>
+                                <th class="w-1/7">{{ __("Id") }}</th>
+                                <th class="w-1/7">{{ __("Surname") }}</th>
+                                <th class="w-1/7">{{ __("First name") }}</th>
+                                <th class="w-1/7">{{ __("Patronymic") }}</th>
+                                <th class="w-1/7">{{ __("Birthdate") }}</th>
+                                <th class="w-1/7">{{ __("Class") }}</th>
+                                <th class="w-1/7">{{ __("Action") }}</th>
                             </tr>
                         </thead>
                         <tbody id="studentsTableBody">
@@ -71,25 +80,21 @@
                     <script>
                         
                         document.getElementById('classSelect').addEventListener('change', function() {
+                            let deleteButtons = document.querySelectorAll('.delete-btn');
                             let classId = this.value;
                             if (classId === '') {
-                                // Если выбрано "Choose here", показываем всех студентов
                                 showAllStudents();
                             } else {
-                                // Загружаем студентов по выбранному классу
-                                // document.getElementById('studentsTableHead').style.display = 'inline-table';
                                 fetchStudentsByClass(classId);
                             }
                         });
 
-                        // Функция для загрузки всех студентов
                         function showAllStudents() {
                             document.getElementById('studentsTableBody').style.display = 'none';
                             document.getElementById('studentsTableHead').style.display = 'none';
                             document.getElementById('allStudents').style.display = 'block';
                         }
 
-                        // Функция для загрузки студентов по выбранному классу
                         function fetchStudentsByClass(classId) {
                             fetch(`/students/class/${classId}`)
                                 .then(response => {
@@ -105,11 +110,9 @@
                                         return;
                                     }
 
-                                    // Очистить текущий список
                                     studentsTableBody.innerHTML = '';
                                     allStudent.style.display ='none';
                                     document.getElementById('studentsTableHead').style.display = 'inline-table';
-                                    // Добавить новых студентов
                                     data.forEach(student => {
                                         studentsTableBody.innerHTML += `
                                             <tr>
@@ -119,38 +122,45 @@
                                                 <td>${student.patronymic}</td>
                                                 <td>${student.birthdate}</td>
                                                 <td>${student.class.name}</td>
+                                                <td>
+                                                    <form action="/students/${student.id}" method="POST" class="delete-form">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="delete-btn">{{ __("Delete") }}</button>
+                                                    </form>
+                                                </td>
                                             </tr>
                                         `;
                                     });
                                 })
                                 .catch(error => console.error('Error:', error));
                         }
+
+                        document.getElementById('classSelect').addEventListener('change', function() {
+                            let deleteButtons = document.querySelectorAll('.delete-btn');
+                            deleteButtons.forEach(button => {
+                                button.addEventListener('click', function (event) {
+                                    event.preventDefault();
+                                    const form = this.closest('form');
+                                    if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+                                        form.submit();
+                                    }
+                                });
+                            });
+                        });
+                        document.addEventListener('DOMContentLoaded', function () {
+                            let deleteButtons = document.querySelectorAll('.delete-btn');
+                            deleteButtons.forEach(button => {
+                                button.addEventListener('click', function (event) {
+                                    event.preventDefault();
+                                    const form = this.closest('form');
+                                    if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+                                        form.submit();
+                                    }
+                                });
+                            });
+                        });
                     </script>
-                    {{-- <hr><hr><hr><hr>
-                    <table class="table-fixed w-full text-center text-gray-900 dark:text-gray-100">
-                        <thead>
-                            <tr>
-                                <th class="w-1/6">{{ __("Id") }}</th>
-                                <th class="w-1/6">{{ __("Surname") }}</th>
-                                <th class="w-1/6">{{ __("First name") }}</th>
-                                <th class="w-1/6">{{ __("Patronymic") }}</th>
-                                <th class="w-1/6">{{ __("Birthdate") }}</th>
-                                <th class="w-1/6">{{ __("Class") }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($list as $el)
-                                <tr>
-                                    <td>{{ $el->id }}</td>
-                                    <td>{{ $el->surname }}</td>
-                                    <td>{{ $el->first_name }}</td>
-                                    <td>{{ $el->patronymic }}</td>
-                                    <td>{{ $el->birthdate }}</td>
-                                    <td>{{ $el->class->name }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table> --}}
                 </div>
             </div>
         </div>

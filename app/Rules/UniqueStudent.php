@@ -14,7 +14,7 @@ class UniqueStudent implements Rule
      */
     public function __construct()
     {
-        //
+        //  
     }
 
     /**
@@ -30,14 +30,23 @@ class UniqueStudent implements Rule
         $first_name = request()->input('first_name');
         $patronymic = request()->input('patronymic');
         $birthdate = request()->input('birthdate');
+        $class_id = request()->input('class_id');
+
+        \Log::info('Validating unique student:', [
+            'surname' => $surname,
+            'first_name' => $first_name,
+            'patronymic' => $patronymic,
+            'birthdate' => $birthdate,
+            'class_id' => $class_id,
+        ]);
 
         return !Student::where('surname', $surname)
                     ->where('first_name', $first_name)
                     ->where('patronymic', $patronymic)
                     ->where('birthdate', $birthdate)
+                    ->where('class_id', $class_id)
                     ->exists();
     }
-
     /**
      * Get the validation error message.
      *
